@@ -2,17 +2,18 @@ import os
 import sys
 from dotenv import load_dotenv
 
-# .env faylini yuklash
 load_dotenv()
 
-# Telegram Bot sozlamalari
 TOKEN = os.getenv("BOT_TOKEN")
 ADMIN_ID = os.getenv("ADMIN_ID")
 
-# API va Host sozlamalari
-BASE_URL = os.getenv("BASE_URL")
-DJANGO_HOST = os.getenv("DJANGO_HOST")
+# Render'da buni https://darvoza-bot-service.onrender.com/api/ deb kiritasiz
+BASE_URL = os.getenv("BASE_URL", "http://127.0.0.1:8000/api/")
+# Render'da buni https://darvoza-bot-service.onrender.com deb kiritasiz (rasmlar uchun)
+DJANGO_HOST = os.getenv("DJANGO_HOST", "http://127.0.0.1:8000")
 
-# Pro himoya: Agar .env dagi eng muhim ma'lumotlar bo'lmasa, dastur ishga tushmaydi
-if not all([TOKEN, BASE_URL, DJANGO_HOST]):
-    sys.exit("❌ XATO: .env faylida kerakli o'zgaruvchilar (BOT_TOKEN, BASE_URL yoki DJANGO_HOST) topilmadi!")
+if not TOKEN:
+    sys.exit("❌ XATO: BOT_TOKEN topilmadi!")
+
+if not BASE_URL.endswith('/'):
+    BASE_URL += '/'

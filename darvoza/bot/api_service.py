@@ -2,19 +2,19 @@ import aiohttp
 import logging
 from config import BASE_URL
 
-# Server javob bermasa bot qotib qolmasligi uchun 10 soniyalik limit (Pro yondashuv)
 TIMEOUT = aiohttp.ClientTimeout(total=10)
 
 async def get_categories():
     try:
         async with aiohttp.ClientSession(timeout=TIMEOUT) as session:
-            async with session.get(f"{BASE_URL}kategoriyalar/") as response:  # To'g'ri
+            url = f"{BASE_URL}kategoriyalar/"
+            async with session.get(url) as response:
                 if response.status == 200:
                     return await response.json()
-                logging.warning(f"Kategoriya olishda xato. Status: {response.status}")
+                logging.error(f"API Xato: {response.status}")
                 return []
     except Exception as e:
-        logging.error(f"Kategoriyani olishda xatolik: {e}")
+        logging.error(f"Ulanishda xato: {e}")
         return []
 
 async def get_products_by_category(category_id):
@@ -26,5 +26,5 @@ async def get_products_by_category(category_id):
                     return await response.json()
                 return []
     except Exception as e:
-        logging.error(f"Mahsulotlarni olishda xatolik: {e}")
+        logging.error(f"Mahsulot xatosi: {e}")
         return []

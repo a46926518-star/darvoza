@@ -7,8 +7,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(os.path.join(BASE_DIR, ".env"))
 
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-zaxira-kalit-12345')
-DEBUG = os.getenv('DEBUG', 'True') == 'True'
+
+# DEBUG productionda False bo'lishi kerak
+DEBUG = os.getenv('DEBUG', 'False') == 'True'
+
+# Render manzilini va localhostni qo'shamiz
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '*').split(',')
+if os.getenv('RENDER_EXTERNAL_HOSTNAME'):
+    ALLOWED_HOSTS.append(os.getenv('RENDER_EXTERNAL_HOSTNAME'))
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -18,14 +24,21 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'drf_yasg',
     'rest_framework_simplejwt',
     'corsheaders',
     'django_filters',
     'api',
+    'whitenoise.runserver_nostatic', 
 ]
+
+
+
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -64,9 +77,9 @@ LANGUAGE_CODE = 'uz-uz'
 TIME_ZONE = 'Asia/Tashkent'
 USE_I18N = True
 USE_TZ = True
-
-STATIC_URL = 'static/'
+TATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
@@ -76,5 +89,5 @@ REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',),
 }
 
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_ALL_ORIGINS = True #
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

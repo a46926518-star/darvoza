@@ -9,27 +9,25 @@ import keyboards as kb
 import api_service as api
 from config import TOKEN, DJANGO_HOST
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+logging.basicConfig(level=logging.INFO)
 
 bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 dp = Dispatcher()
 
-# --- 1. Start buyrug'i ---
+
 @dp.message(Command("start"))
 async def start_cmd(message: types.Message):
-    await message.answer(
-        f"Assalomu alaykum, <b>{message.from_user.full_name}</b>!\nDarvoza savdo botiga xush kelibsiz.",
-        reply_markup=kb.main_menu
-    )
+    await message.answer(f"Xush kelibsiz, {message.from_user.full_name}!", reply_markup=kb.main_menu)
 
-# --- 2. Katalog va Mahsulotlar ---
+
 @dp.message(F.text == "🚪 Katalog")
 async def show_categories(message: types.Message):
     data = await api.get_categories()
     if data:
         await message.answer("<b>Kategoriyani tanlang:</b>", reply_markup=kb.build_categories_kb(data))
     else:
-        await message.answer("📭 Hozircha kategoriyalar yo'q yoki server bilan ulanishda xato.")
+        await message.answer("📭 Hozircha katalog bo'sh yoki server uyg'onmagan.")
+
 
 @dp.callback_query(F.data.startswith("category_"))
 async def show_products(callback: types.CallbackQuery):
@@ -37,82 +35,28 @@ async def show_products(callback: types.CallbackQuery):
     products = await api.get_products_by_category(cat_id)
 
     if not products:
-        await callback.message.answer("❌ Bu bo'limda mahsulotlar yo'q.")
+        await callback.message.answer("❌ Mahsulot topilmadi.")
     else:
         for p in products:
-            caption = (
-                f"🏷 <b>{p.get('name', 'Nomsiz')}</b>\n"
-                f"💰 Narxi: <b>{p.get('price', '0')} $</b>\n\n"
-                f"📝 <i>{p.get('description') or 'Tavsif mavjud emas.'}</i>"
-            )
+            caption = f"🏷 <b>{p['name']}</b>\n💰 Narxi: {p['price']} $\n\n{p.get('description', '')}"
             img_url = p.get('image')
 
+            # Agar rasm URL'i to'liq bo'lmasa, hostni qo'shamiz
+            if img_url and not img_url.startswith('http'):
+                img_url = f"{DJANGO_HOST.rstrip('/')}{img_url}"
+
             if img_url:
-                if not img_url.startswith('http'):
-                    img_url = f"{DJANGO_HOST.rstrip('/')}{img_url}"
-                try:
-                    await callback.message.answer_photo(
-                        photo=img_url,
-                        caption=caption,
-                        reply_markup=kb.buy_product_kb(p['id'])
-                    )
-                except Exception as e:
-                    logging.error(f"Rasm yuborishda xato: {e}")
-                    await callback.message.answer(caption, reply_markup=kb.buy_product_kb(p['id']))
+                await callback.message.answer_photo(photo=img_url, caption=caption,
+                                                    reply_markup=kb.buy_product_kb(p['id']))
             else:
                 await callback.message.answer(caption, reply_markup=kb.buy_product_kb(p['id']))
     await callback.answer()
 
-# --- 3. Qolgan asosiy menyu tugmalari ---
-@dp.message(F.text == "👤 Profilim")
-async def show_profile(message: types.Message):
-    text = (
-        f"👤 <b>Sizning profilingiz:</b>\n\n"
-        f"🆔 ID: <code>{message.from_user.id}</code>\n"
-        f"👤 Ism: {message.from_user.full_name}\n"
-        f"🌐 Til: {message.from_user.language_code}"
-    )
-    await message.answer(text)
 
-@dp.message(F.text == "📦 Buyurtmalarim")
-async def show_orders(message: types.Message):
-    await message.answer("📦 Hozircha sizda faol buyurtmalar mavjud emas.")
-
-@dp.message(F.text == "📞 Bog'lanish")
-async def contact_us(message: types.Message):
-    await message.answer(
-        "📞 <b>Biz bilan bog'lanish:</b>\n\n"
-        "📍 Manzil: Farg'ona viloyati\n"
-        "☎️ Telefon: +998 91 857 18 11\n"
-        "👨‍💻 Admin: @darvozaadmin\n"
-        "Savollaringiz bo'lsa, bemalol qo'ng'iroq qiling!"
-    )
-
-@dp.message(F.text == "ℹ️ Ma'lumot")
-async def info_cmd(message: types.Message):
-    await message.answer(
-        "ℹ️ <b>Bot haqida:</b>\n\n"
-        "Ushbu bot darvoza savdosi bilan shug'ullanuvchi korxona uchun maxsus ishlab chiqilgan. "
-        "Bu yerda siz turli xil (temir, yog'och, avtomat) darvozalarni ko'rishingiz va buyurtma berishingiz mumkin."
-    )
-
-# --- 4. Buyurtma berish tugmasi ---
-@dp.callback_query(F.data.startswith("buy_"))
-async def process_buy(callback: types.CallbackQuery):
-    product_id = callback.data.split("_")[1]
-    await callback.message.answer(
-        f"✅ Buyurtmangiz qabul qilindi (ID: {product_id}).\n"
-        f"Tez orada operatorimiz siz bilan bog'lanadi!"
-    )
-    await callback.answer()
-
-# --- 5. Ishga tushirish (Main) ---
 async def main():
-    logging.info("🚀 Bot ishga tushirildi...")
+    logging.info("🚀 Bot ishladi...")
     await dp.start_polling(bot)
 
+
 if __name__ == "__main__":
-    try:
-        asyncio.run(main())
-    except (KeyboardInterrupt, SystemExit):
-        logging.info("Bot to'xtatildi.")
+    asyncio.run(main())
