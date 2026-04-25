@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Category, Product, Order, OrderItem, Comment
+from .models import Category, Product, Order, OrderItem, Comment,Profile,Feedback
 
 # Kategoriya admin paneli
 @admin.register(Category)
@@ -34,3 +34,18 @@ class OrderAdmin(admin.ModelAdmin):
 class CommentAdmin(admin.ModelAdmin):
     list_display = ('id', 'product', 'user', 'created_at')
     list_filter = ('created_at',)
+
+
+
+
+
+@admin.register(Profile)
+class ProfileAdmin(admin.ModelAdmin):
+    list_display = ('user', 'telegram_id', 'phone_number')
+    search_fields = ('user__username', 'telegram_id', 'phone_number')
+
+@admin.register(Feedback)
+class FeedbackAdmin(admin.ModelAdmin):
+    list_display = ('user', 'subject', 'created_at')
+    list_filter = ('created_at',)
+    search_fields = ('user__username', 'subject', 'message')

@@ -1,7 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-# 1. Kategoriya
 class Category(models.Model):
     name = models.CharField(max_length=100, verbose_name="Kategoriya nomi")
 
@@ -12,7 +11,6 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
-# 2. Mahsulot
 class Product(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='products', verbose_name="Kategoriya")
     name = models.CharField(max_length=200, verbose_name="Mahsulot nomi")
@@ -28,7 +26,6 @@ class Product(models.Model):
     def __str__(self):
         return self.name
 
-# 3. Sharhlar
 class Comment(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='comments', verbose_name="Mahsulot")
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Foydalanuvchi")
@@ -42,7 +39,6 @@ class Comment(models.Model):
     def __str__(self):
         return f"{self.user.username} sharhi"
 
-# 4. Buyurtma
 class Order(models.Model):
     STATUS_CHOICES = (
         ('pending', 'Kutilmoqda'),
@@ -62,7 +58,6 @@ class Order(models.Model):
     def __str__(self):
         return f"Buyurtma #{self.id}"
 
-# 5. Buyurtma elementlari
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, related_name='items', on_delete=models.CASCADE, verbose_name="Buyurtma")
     product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name="Mahsulot")
@@ -71,3 +66,24 @@ class OrderItem(models.Model):
 
     def __str__(self):
         return f"{self.product.name} ({self.quantity} dona)"
+
+
+
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name="Foydalanuvchi")
+    telegram_id = models.BigIntegerField(unique=True, verbose_name="Telegram ID")
+    phone_number = models.CharField(max_length=20, blank=True, null=True, verbose_name="Telefon raqami")
+    address = models.TextField(blank=True, null=True, verbose_name="Manzili")
+
+    def __str__(self):
+        return f"{self.user.username} profili"
+
+class Feedback(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Foydalanuvchi")
+    subject = models.CharField(max_length=255, verbose_name="Mavzu")
+    message = models.TextField(verbose_name="Xabar matni")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Xabar"
+        verbose_name_plural = "Xabarlar"

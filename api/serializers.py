@@ -1,6 +1,6 @@
 import requests
 from rest_framework import serializers
-from .models import Category, Product, Order, OrderItem, Comment
+from .models import Category, Product, Order, OrderItem, Comment,Profile,Feedback
 
 
 def send_telegram_admin(order_id, phone, full_name, total_price):
@@ -68,3 +68,16 @@ class OrderSerializer(serializers.ModelSerializer):
         )
 
         return order
+
+
+class ProfileSerializer(serializers.ModelSerializer):
+    username = serializers.ReadOnlyField(source='user.username')
+
+    class Meta:
+        model = Profile
+        fields = ['id', 'username', 'telegram_id', 'phone_number', 'address']
+
+class FeedbackSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Feedback
+        fields = ['id', 'user', 'subject', 'message', 'created_at']
