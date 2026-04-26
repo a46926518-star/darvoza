@@ -4,6 +4,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
 from .models import Category, Product, Order, Profile, Feedback
 from .serializers import CategorySerializer, ProductSerializer, OrderSerializer, ProfileSerializer, FeedbackSerializer
+from rest_framework.views import APIView
 
 # --- KATEGORIYALAR ---
 class CategoryListView(generics.ListAPIView):
