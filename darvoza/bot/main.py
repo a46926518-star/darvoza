@@ -1,5 +1,8 @@
 import logging
 import asyncio
+import os
+from aiohttp import web
+
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import Command
 from aiogram.client.default import DefaultBotProperties
@@ -13,6 +16,18 @@ logging.basicConfig(level=logging.INFO)
 
 bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 dp = Dispatcher()
+
+# --- Render uchun Web Server (Portni band qilish uchun) ---
+async def start_web_server():
+    app = web.Application()
+    app.router.add_get('/', lambda r: web.Response(text="Bot ishlayapti!"))
+    runner = web.AppRunner(app)
+    await runner.setup()
+    port = int(os.environ.get("PORT", 8000))
+    site = web.TCPSite(runner, '0.0.0.0', port)
+    await site.start()
+    print(f"Web server {port}-portda ishga tushdi")
+# -----------------------------------------------------------
 
 @dp.message(Command("start"))
 async def start_cmd(message: types.Message):
@@ -101,6 +116,7 @@ async def show_products(callback: types.CallbackQuery):
 
 
 async def main():
+    await start_web_server() # Eng birinchi Render kutayotgan serverni yoqamiz
     logging.info("🚀 Bot ishladi...")
     await dp.start_polling(bot)
 
