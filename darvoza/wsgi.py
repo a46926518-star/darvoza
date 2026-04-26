@@ -16,7 +16,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 sys.path.append(str(BASE_DIR))
 sys.path.append(str(BASE_DIR / "darvoza"))
 
-
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'darvoza.settings')
 
 application = get_wsgi_application()
