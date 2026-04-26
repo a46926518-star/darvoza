@@ -1,13 +1,11 @@
 from django.contrib import admin
 from .models import Category, Product, Order, OrderItem, Comment,Profile,Feedback
 
-# Kategoriya admin paneli
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ('id', 'name')
     search_fields = ('name',)
 
-# Mahsulot admin paneli
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'price', 'category', 'created_at')
@@ -15,13 +13,11 @@ class ProductAdmin(admin.ModelAdmin):
     search_fields = ('name', 'description')
     ordering = ('-created_at',)
 
-# Buyurtma ichidagi mahsulotlarni ko'rsatish
 class OrderItemInline(admin.TabularInline):
     model = OrderItem
     extra = 0
     readonly_fields = ('price',)
 
-# Buyurtmalar admin paneli
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
     list_display = ('id', 'user', 'status', 'total_amount', 'created_at')
@@ -29,14 +25,10 @@ class OrderAdmin(admin.ModelAdmin):
     inlines = [OrderItemInline]
     search_fields = ('user__username', 'id')
 
-# Sharhlarni boshqarish
 @admin.register(Comment)
 class CommentAdmin(admin.ModelAdmin):
     list_display = ('id', 'product', 'user', 'created_at')
     list_filter = ('created_at',)
-
-
-
 
 
 @admin.register(Profile)

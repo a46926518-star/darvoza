@@ -1,30 +1,36 @@
 import aiohttp
-import logging
 from config import BASE_URL
+import logging
 
-TIMEOUT = aiohttp.ClientTimeout(total=10)
-
-async def get_categories():
-    try:
-        async with aiohttp.ClientSession(timeout=TIMEOUT) as session:
-            url = f"{BASE_URL}kategoriyalar/"
+async def get_profile(telegram_id):
+    """Mijoz profilini API dan olish"""
+    url = f"{BASE_URL}profile/{telegram_id}/" # Renderdagi URL
+    async with aiohttp.ClientSession() as session:
+        try:
             async with session.get(url) as response:
                 if response.status == 200:
                     return await response.json()
-                logging.error(f"API Xato: {response.status}")
-                return []
-    except Exception as e:
-        logging.error(f"Ulanishda xato: {e}")
-        return []
+                elif response.status == 404:
+                     return None # Profil yo'q bo'lsa
+                else:
+                    logging.error(f"API Profil xatosi: {response.status}")
+                    return None
+        except Exception as e:
+            logging.error(f"Ulanish xatosi (Profile): {e}")
+            return None
 
-async def get_products_by_category(category_id):
-    try:
-        async with aiohttp.ClientSession(timeout=TIMEOUT) as session:
-            url = f"{BASE_URL}mahsulotlar/?category={category_id}"
+async def get_orders(telegram_id):
+    url = f"{BASE_URL}orders/"
+    async with aiohttp.ClientSession() as session:
+        try:
             async with session.get(url) as response:
                 if response.status == 200:
-                    return await response.json()
-                return []
-    except Exception as e:
-        logging.error(f"Mahsulot xatosi: {e}")
-        return []
+                    all_orders = await response.json()
+                    user_orders = [o for o in all_orders if o.get('user_telegram_id') == telegram_id]
+                    return user_orders
+                else:
+                     logging.error(f"API Buyurtmalar xatosi: {response.status}")
+                     return None
+        except Exception as e:
+             logging.error(f"Ulanish xatosi (Orders): {e}")
+             return None
