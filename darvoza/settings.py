@@ -1,18 +1,22 @@
 import os
+import sys
 from pathlib import Path
-from datetime import timedelta
 from dotenv import load_dotenv
 
+# Loyiha papkasi tuzilmasini to'g'ri ko'rsatish
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# .env faylini qidirish (Agar bot papkasida bo'lsa ham, asosiyda bo'lsa ham topadi)
 load_dotenv(os.path.join(BASE_DIR, ".env"))
+load_dotenv(os.path.join(BASE_DIR, "darvoza", "bot", ".env"))
 
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-zaxira-kalit-12345')
 
-DEBUG = os.getenv('DEBUG', 'True') == 'True'
+# Render-da DEBUG doim False bo'lishi kerak
+DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '*').split(',')
-if os.getenv('RENDER_EXTERNAL_HOSTNAME'):
-    ALLOWED_HOSTS.append(os.getenv('RENDER_EXTERNAL_HOSTNAME'))
+# Render-da ishlashi uchun '*' juda muhim
+ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
     'whitenoise.runserver_nostatic',
@@ -33,7 +37,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware', # Statik fayllar uchun
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -75,10 +79,9 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# Whitenoise orqali statik fayllarni siqish va keshda saqlash
 STORAGES = {
-    "default": {
-        "BACKEND": "django.core.files.storage.FileSystemStorage",
-    },
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },

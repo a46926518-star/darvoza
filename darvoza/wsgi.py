@@ -8,10 +8,14 @@ https://docs.djangoproject.com/en/6.0/howto/deployment/wsgi/
 """
 import os
 import sys
+from pathlib import Path
 from django.core.wsgi import get_wsgi_application
 
-path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.append(os.path.join(path, 'darvoza'))
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+sys.path.append(str(BASE_DIR))
+sys.path.append(str(BASE_DIR / "darvoza"))
+
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'darvoza.settings')
 
