@@ -70,3 +70,35 @@ class FeedbackCreateView(generics.CreateAPIView):
     queryset = Feedback.objects.all()
     serializer_class = FeedbackSerializer
     permission_classes = [permissions.AllowAny]
+
+
+
+class NewProductsView(generics.ListAPIView):
+    queryset = Product.objects.all().order_by('-id')[:5]
+    serializer_class = ProductSerializer
+    permission_classes = [permissions.AllowAny]
+
+class TopProductsView(generics.ListAPIView):
+    queryset = Product.objects.all().order_by('-price')[:5]
+    serializer_class = ProductSerializer
+    permission_classes = [permissions.AllowAny]
+
+class ProductsByCategoryView(generics.ListAPIView):
+    serializer_class = ProductSerializer
+    permission_classes = [permissions.AllowAny]
+
+    def get_queryset(self):
+        cat_id = self.kwargs['cat_id']
+        return Product.objects.filter(category_id=cat_id)
+
+class OrderStatsView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request):
+        count = Order.objects.count()
+        return Response({"total_orders": count})
+
+class ProfileCreateView(generics.CreateAPIView):
+    queryset = Profile.objects.all()
+    serializer_class = ProfileSerializer
+    permission_classes = [permissions.AllowAny]
