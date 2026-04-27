@@ -6,25 +6,24 @@ from rest_framework_simplejwt.views import (
 )
 
 urlpatterns = [
-    # Auth & JWT
+
     path('register/', views.RegisterView.as_view(), name='auth_register'),
     path('login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('login/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
-    # Kategoriyalar
     path('kategoriyalar/', views.CategoryListView.as_view(), name='category-list'),
     path('admin/kategoriya-qushish/', views.CategoryCreateView.as_view(), name='category-create'),
 
-    # Mahsulotlar
+
     path('mahsulotlar/', views.ProductListView.as_view(), name='product-list'),
     path('mahsulotlar/<int:pk>/', views.ProductDetailView.as_view(), name='product-detail'),
     path('admin/mahsulot-qushish/', views.ProductCreateView.as_view(), name='product-create'),
     path('admin/mahsulot-tahrirlash/<int:pk>/', views.ProductUpdateDeleteView.as_view(), name='product-update-delete'),
 
-    # Buyurtmalar
+
     path('buyurtma-berish/', views.OrderCreateView.as_view(), name='order-create'),
 
-    # Savat (Cart)
+
     path('cart/', views.CartListView.as_view(), name='cart-list'),
     path('cart/add/', views.CartAddView.as_view(), name='cart-add'),
 
