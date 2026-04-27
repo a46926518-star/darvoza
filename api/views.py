@@ -1,12 +1,12 @@
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
-from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django.contrib.auth.models import User
 from django.core.mail import send_mail
 import random
+from rest_framework.pagination import PageNumberPagination
 
 
 from .models import Category, Product, Order, Profile, Feedback, CartItem
