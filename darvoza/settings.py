@@ -3,21 +3,16 @@ from pathlib import Path
 from datetime import timedelta
 from dotenv import load_dotenv
 
-# Loyiha asosiy papkasi
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# .env faylini bir necha joydan qidirish (topish ehtimolini oshirish uchun)
 load_dotenv(os.path.join(BASE_DIR, ".env"))
 load_dotenv(os.path.join(BASE_DIR, "darvoza", "bot", ".env"))
 
-# Xavfsizlik kaliti va Debug rejimi
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-!vsk7d=9rtru7zd*b&j_&l_ia-0')
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
-# Renderda ishlashi uchun barcha hostlarga ruxsat
 ALLOWED_HOSTS = ['*']
 
-# O'rnatilgan ilovalar
 INSTALLED_APPS = [
     'whitenoise.runserver_nostatic',
     'django.contrib.admin',
@@ -35,7 +30,6 @@ INSTALLED_APPS = [
     'api',
 ]
 
-# Middleware sozlamalari
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
@@ -50,7 +44,6 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'darvoza.urls'
 
-# Shabloni (Template) sozlamalari
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -67,7 +60,6 @@ TEMPLATES = [
     },
 ]
 
-# Ma'lumotlar bazasi (SQLite)
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -75,13 +67,11 @@ DATABASES = {
     }
 }
 
-# Til va vaqt sozlamalari
 LANGUAGE_CODE = 'uz-uz'
 TIME_ZONE = 'Asia/Tashkent'
 USE_I18N = True
 USE_TZ = True
 
-# Statik fayllar uchun sozlamalar (Whitenoise bilan)
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STORAGES = {
@@ -90,11 +80,9 @@ STORAGES = {
     },
 }
 
-# Media fayllar
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-# Django Rest Framework sozlamalari
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
@@ -104,9 +92,19 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_FILTER_BACKENDS': (
         'django_filters.rest_framework.DjangoFilterBackend',
+        'rest_framework.filters.SearchFilter',
+        'rest_framework.filters.OrderingFilter', 
     ),
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10,
 }
 
-# CORS ruxsatnomasi
+
+from datetime import timedelta
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'AUTH_HEADER_TYPES': ('Bearer',),
+}
 CORS_ALLOW_ALL_ORIGINS = True
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

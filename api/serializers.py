@@ -1,6 +1,7 @@
 import requests
 from rest_framework import serializers
-from .models import Category, Product, Order, OrderItem, Comment,Profile,Feedback
+from .models import Category, Product, Order, OrderItem, Comment,Profile,Feedback,CartItem
+from django.contrib.auth.models import User
 
 
 def send_telegram_admin(order_id, phone, full_name, total_price):
@@ -81,3 +82,32 @@ class FeedbackSerializer(serializers.ModelSerializer):
     class Meta:
         model = Feedback
         fields = ['id', 'user', 'subject', 'message', 'created_at']
+
+
+
+class RegisterSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True)
+
+    class Meta:
+        model = User
+        fields = ('username', 'password', 'email', 'first_name', 'last_name')
+
+    def create(self, validated_data):
+        user = User.objects.create_user(
+            username=validated_data['username'],
+            email=validated_data.get('email', ''),
+            password=validated_data['password'],
+            first_name=validated_data.get('first_name', ''),
+            last_name=validated_data.get('last_name', '')
+        )
+        return user
+
+
+
+
+class CartItemSerializer(serializers.ModelSerializer):
+    product_details = ProductSerializer(source='product', read_only=True)
+
+    class Meta:
+        model = CartItem
+        fields = ['id', 'product', 'product_details', 'quantity']

@@ -1,29 +1,36 @@
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
-from .models import Category, Product, Order, Profile, Feedback
-from .serializers import CategorySerializer, ProductSerializer, OrderSerializer, ProfileSerializer, FeedbackSerializer
+from django.contrib.auth.models import User
 
-# --- KATEGORIYALAR ---
+from .models import Category, Product, Order, Profile, Feedback, CartItem
+from .serializers import (
+    CategorySerializer, ProductSerializer, OrderSerializer,
+    ProfileSerializer, FeedbackSerializer, CartItemSerializer, RegisterSerializer
+)
+
+class RegisterView(generics.CreateAPIView):
+    queryset = User.objects.all()
+    permission_classes = [AllowAny]
+    serializer_class = RegisterSerializer
+
 class CategoryListView(generics.ListAPIView):
     queryset = Category.objects.all().order_by('id')
     serializer_class = CategorySerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [AllowAny]
 
-class ProductsByCategoryView(generics.ListAPIView):
-    serializer_class = ProductSerializer
-    permission_classes = [permissions.AllowAny]
-    def get_queryset(self):
-        cat_id = self.kwargs['cat_id']
-        return Product.objects.filter(category_id=cat_id)
+class CategoryCreateView(generics.CreateAPIView):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    permission_classes = [IsAdminUser]
 
-# --- MAHSULOTLAR ---
 class ProductListView(generics.ListAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [AllowAny]
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_fields = ['category']
     search_fields = ['name', 'description']
@@ -32,60 +39,56 @@ class ProductListView(generics.ListAPIView):
 class ProductDetailView(generics.RetrieveAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [AllowAny]
 
-class ProductSearchView(generics.ListAPIView):
+class ProductCreateView(generics.CreateAPIView):
+    queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    permission_classes = [permissions.AllowAny]
-    def get_queryset(self):
-        query = self.request.query_params.get('q', '')
-        return Product.objects.filter(name__icontains=query)
+    permission_classes = [IsAdminUser]
 
-class NewProductsView(generics.ListAPIView):
-    queryset = Product.objects.all().order_by('-id')[:5]
+class ProductUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [IsAdminUser]
 
-class TopProductsView(generics.ListAPIView):
-    queryset = Product.objects.all().order_by('-price')[:5]
-    serializer_class = ProductSerializer
-    permission_classes = [permissions.AllowAny]
-
-# --- BUYURTMALAR ---
 class OrderCreateView(generics.CreateAPIView):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [AllowAny]
 
 class OrderListView(generics.ListAPIView):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
-    permission_classes = [permissions.AllowAny]
-
-class OrderDetailView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Order.objects.all()
-    serializer_class = OrderSerializer
-    permission_classes = [permissions.AllowAny]
-
-class OrderStatsView(APIView):
-    permission_classes = [permissions.AllowAny]
-    def get(self, request):
-        count = Order.objects.count()
-        return Response({"total_orders": count})
-
-# --- PROFIL VA FEEDBACK ---
-class ProfileCreateView(generics.CreateAPIView):
-    queryset = Profile.objects.all()
-    serializer_class = ProfileSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [IsAuthenticated]
 
 class ProfileDetailView(generics.RetrieveUpdateAPIView):
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [AllowAny]
     lookup_field = 'telegram_id'
 
 class FeedbackCreateView(generics.CreateAPIView):
     queryset = Feedback.objects.all()
     serializer_class = FeedbackSerializer
+    permission_classes = [AllowAny]
+
+class CartListView(generics.ListAPIView):
+    serializer_class = CartItemSerializer
+    permission_classes = [IsAuthenticated]
+    def get_queryset(self):
+        return CartItem.objects.filter(user=self.request.user)
+
+class CartAddView(generics.CreateAPIView):
+    serializer_class = CartItemSerializer
+    permission_classes = [IsAuthenticated]
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+
+class ProductsByCategoryView(generics.ListAPIView):
+    serializer_class = ProductSerializer
     permission_classes = [permissions.AllowAny]
+
+    def get_queryset(self):
+        cat_id = self.kwargs['cat_id']
+        return Product.objects.filter(category_id=cat_id)

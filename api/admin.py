@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Category, Product, Order, OrderItem, Comment,Profile,Feedback
+from .models import Category, Product, Order, OrderItem, Comment, Profile, Feedback, CartItem
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
@@ -30,7 +30,6 @@ class CommentAdmin(admin.ModelAdmin):
     list_display = ('id', 'product', 'user', 'created_at')
     list_filter = ('created_at',)
 
-
 @admin.register(Profile)
 class ProfileAdmin(admin.ModelAdmin):
     list_display = ('user', 'telegram_id', 'phone_number')
@@ -41,3 +40,8 @@ class FeedbackAdmin(admin.ModelAdmin):
     list_display = ('user', 'subject', 'created_at')
     list_filter = ('created_at',)
     search_fields = ('user__username', 'subject', 'message')
+
+@admin.register(CartItem)
+class CartItemAdmin(admin.ModelAdmin):
+    list_display = ('id', 'user', 'product', 'quantity') # 'created_at' bu yerda bo'lmasin
+    list_filter = ('user',) # bu yerdan ham olib tashlandi

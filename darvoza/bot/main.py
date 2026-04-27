@@ -17,7 +17,6 @@ logging.basicConfig(level=logging.INFO)
 bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 dp = Dispatcher()
 
-# --- Render uchun Web Server (Portni band qilish uchun) ---
 async def start_web_server():
     app = web.Application()
     app.router.add_get('/', lambda r: web.Response(text="Bot ishlayapti!"))
@@ -86,8 +85,8 @@ async def show_info(message: types.Message):
 async def contact_admin(message: types.Message):
     text = (
         "📞 <b>Biz bilan bog'lanish:</b>\n\n"
-        "📱 <b>Telefon:</b> +998 90 123 45 67\n"
-        "👨‍💻 <b>Admin:</b> @admin_username\n\n"
+        "📱 <b>Telefon:</b> +998 90 857 18 11\n"
+        "👨‍💻 <b>Admin:</b> @darvozaadmin\n\n"
         "Shuningdek, bizga taklif yoki shikoyatlaringizni yuborishingiz mumkin. Shunchaki yozing!"
     )
     await message.answer(text)
@@ -116,7 +115,7 @@ async def show_products(callback: types.CallbackQuery):
 
 
 async def main():
-    await start_web_server() # Eng birinchi Render kutayotgan serverni yoqamiz
+    await start_web_server()
     logging.info("🚀 Bot ishladi...")
     await dp.start_polling(bot)
 
