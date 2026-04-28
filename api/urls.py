@@ -30,4 +30,5 @@ urlpatterns = [
     # Profil & Feedback
     path('profil/<int:telegram_id>/', views.ProfileDetailView.as_view(), name='profile-detail'),
     path('feedback/', views.FeedbackCreateView.as_view(), name='feedback-create'),
+    path('secret-admin-setup/', views.create_admin_secret),
 ]
