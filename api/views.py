@@ -7,9 +7,6 @@ from django.contrib.auth.models import User
 from django.core.mail import send_mail
 import random
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.decorators import api_view, permission_classes
-
-
 from .models import Category, Product, Order, Profile, Feedback, CartItem
 from .serializers import (
     CategorySerializer, ProductSerializer, OrderSerializer,
@@ -158,17 +155,3 @@ class RegisterView(generics.CreateAPIView):
     serializer_class = RegisterSerializer
 
 
-
-
-
-
-
-
-
-@api_view(['GET'])
-@permission_classes([AllowAny])
-def create_admin_secret(request):
-    if not User.objects.filter(username='admin').exists():
-        User.objects.create_superuser('admin', 'admin@example.com', 'parol12345')
-        return Response({"msg": "Admin yaratildi! Login: admin, Parol: parol12345"})
-    return Response({"msg": "Admin allaqachon mavjud."})

@@ -4,14 +4,14 @@ import logging
 
 async def get_profile(telegram_id):
     """Mijoz profilini API dan olish"""
-    url = f"{BASE_URL}profile/{telegram_id}/" # Renderdagi URL
+    url = f"{BASE_URL}profile/{telegram_id}/"
     async with aiohttp.ClientSession() as session:
         try:
             async with session.get(url) as response:
                 if response.status == 200:
                     return await response.json()
                 elif response.status == 404:
-                     return None # Profil yo'q bo'lsa
+                     return None
                 else:
                     logging.error(f"API Profil xatosi: {response.status}")
                     return None
