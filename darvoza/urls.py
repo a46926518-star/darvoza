@@ -4,7 +4,7 @@ from django.http import HttpResponse
 
 def home_view(request):
     html_content = """
-    <h1>Darvoza API Backend</h1>
+    <h1>Darvoza API </h1>
     <p>Mavjud ochiq yo'llar:</p>
     <ul>
         <li><a href="/api/mahsulotlar/">/api/mahsulotlar/</a> - Mahsulotlar ro'yxati</li>

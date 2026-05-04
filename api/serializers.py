@@ -32,12 +32,36 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class ProductSerializer(serializers.ModelSerializer):
-    category_name = serializers.ReadOnlyField(source='category.name')
+    category_name = serializers.CharField(source='category.name', read_only=True)
+
+
+class OrderItemSerializer(serializers.ModelSerializer):
+    class Meta:
+            model = OrderItem
+            fields = '__all__'
 
     class Meta:
         model = Product
         fields = '__all__'
+class OrderSerializer(serializers.ModelSerializer):
+    items = OrderItemSerializer(many=True, read_only=True)
 
+    class Meta:
+        model = Order
+        fields = ['id', 'user', 'status', 'full_name', 'phone_number', 'total_amount', 'items', 'created_at']
+
+    def create(self, validated_data):
+        order = super().create(validated_data)
+        try:
+            send_telegram_admin(
+                order_id=order.id,
+                phone=getattr(order, 'phone_number', 'Nomalum'),
+                full_name=getattr(order, 'full_name', 'Nomalum'),
+                total_price=order.total_amount
+            )
+        except:
+            pass
+        return order
 
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
@@ -50,25 +74,6 @@ class OrderItemSerializer(serializers.ModelSerializer):
         model = OrderItem
         fields = '__all__'
 
-
-class OrderSerializer(serializers.ModelSerializer):
-    items = OrderItemSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = Order
-        fields = '__all__'
-
-    def create(self, validated_data):
-        order = super().create(validated_data)
-
-        send_telegram_admin(
-            order_id=order.id,
-            phone=order.phone_number,
-            full_name=order.full_name,
-            total_price=order.total_amount
-        )
-
-        return order
 
 
 class ProfileSerializer(serializers.ModelSerializer):
