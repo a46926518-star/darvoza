@@ -1,29 +1,24 @@
 from django.contrib import admin
 from django.urls import path, include
-from django.conf import settings
-from django.conf.urls.static import static
-from django.views.generic import RedirectView
-from rest_framework import permissions
-from drf_yasg.views import get_schema_view
-from drf_yasg import openapi
+from django.http import HttpResponse
 
-schema_view = get_schema_view(
-    openapi.Info(
-        title="Darvoza API",
-        default_version='v1',
-        description="Darvoza bot uchun backend xizmati",
-    ),
-    public=True,
-    permission_classes=(permissions.AllowAny,),
-)
+def home_view(request):
+    html_content = """
+    <h1>Darvoza API Backend</h1>
+    <p>Mavjud ochiq yo'llar:</p>
+    <ul>
+        <li><a href="/api/mahsulotlar/">/api/mahsulotlar/</a> - Mahsulotlar ro'yxati</li>
+        <li><a href="/api/kategoriyalar/">/api/kategoriyalar/</a> - Kategoriyalar</li>
+        <li><a href="/cart/">/cart/</a> - Savatcha</li>
+        <li><a href="/admin/">/admin/</a> - Boshqaruv paneli</li>
+    </ul>
+    """
+    return HttpResponse(html_content)
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include('api.urls')),  # API yo'llarini api/urls.py dan oladi
-    path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
-    path('', RedirectView.as_view(url='swagger/', permanent=False)),
-]
+    path('api/', include('api.urls')),
 
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    path('', home_view),
+]

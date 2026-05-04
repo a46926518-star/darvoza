@@ -9,7 +9,7 @@ load_dotenv(os.path.join(BASE_DIR, ".env"))
 load_dotenv(os.path.join(BASE_DIR, "darvoza", "bot", ".env"))
 
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-!vsk7d=9rtru7zd*b&j_&l_ia-0')
-DEBUG = os.getenv('DEBUG', 'False') == 'True'
+DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
 ALLOWED_HOSTS = ['*']
 
