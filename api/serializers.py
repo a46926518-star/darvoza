@@ -1,8 +1,7 @@
 import requests
 from rest_framework import serializers
-from .models import Category, Product, Order, OrderItem, Comment,Profile,Feedback,CartItem
+from .models import Category, Product, Order, OrderItem, Comment, Profile, Feedback, CartItem
 from django.contrib.auth.models import User
-
 
 def send_telegram_admin(order_id, phone, full_name, total_price):
     token = "6821360156:AAEmr6l7_h6lM1f3p3L-l_l_l_l_l"
@@ -23,8 +22,6 @@ def send_telegram_admin(order_id, phone, full_name, total_price):
         print(f"Xabar yuborishda xatolik: {e}")
 
 
-
-
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
@@ -34,15 +31,16 @@ class CategorySerializer(serializers.ModelSerializer):
 class ProductSerializer(serializers.ModelSerializer):
     category_name = serializers.CharField(source='category.name', read_only=True)
 
-
-class OrderItemSerializer(serializers.ModelSerializer):
-    class Meta:
-            model = OrderItem
-            fields = '__all__'
-
     class Meta:
         model = Product
         fields = '__all__'
+
+
+class OrderItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OrderItem
+        fields = '__all__'
+
 class OrderSerializer(serializers.ModelSerializer):
     items = OrderItemSerializer(many=True, read_only=True)
 
@@ -68,11 +66,6 @@ class CommentSerializer(serializers.ModelSerializer):
         model = Comment
         fields = '__all__'
 
-
-class OrderItemSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = OrderItem
-        fields = '__all__'
 
 
 
